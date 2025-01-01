@@ -1,10 +1,38 @@
-import React from 'react';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import Home from './routes/Home';
+import Tv from './routes/Tv';
+import Search from './routes/Search';
+import Header from './components/Header';
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: (
+      <>
+        <Header />
+        <Outlet />
+      </>
+    ),
+    children: [
+      {
+        path: "/",
+        element: <Home />
+      },
+      {
+        path: "/tv",
+        element: <Tv />
+      },
+      {
+        path: "/search",
+        element: <Search />
+      }
+    ]
+  }
+]);
 
 function App() {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-500">Hello World!</h1>
-    </div>
+      <RouterProvider router={router} />
   );
 }
 

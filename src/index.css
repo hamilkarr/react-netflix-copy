@@ -4,12 +4,18 @@
 
 /* 기존 CSS 코드 */
 body {
+  @apply bg-slate-900 text-white;
+
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+main {
+    @apply pt-24;
 }
 
 code {
