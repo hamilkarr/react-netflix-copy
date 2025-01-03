@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMovies, getGenres, IGetMoviesResult, IMovie, IGenre, IGenreList } from "../api";
+import { getMovies, getGenres, IGetMoviesResult, IMovie, IGenre, IGenreList, convertGenreIdsToNames } from "../api";
 import Loader from "../components/Loader";
 import { getImageUrl } from "../utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const sliderVariants = {
   normal: {
@@ -31,9 +32,18 @@ const infoVariants = {
     opacity: 0,
   }
 }
-const SliderMovie = ({ movie, index }: { movie: IMovie, index: number }) => {
+const SliderMovie = ({ movie, index, getGenreNames }: { 
+  movie: IMovie;
+  index: number;
+  getGenreNames: (ids: number[]) => string[];
+}) => {
+  const navigate = useNavigate();
+  const onMovieClicked = () => {
+    navigate(`/movies/${movie.id}`);
+  }
   return (
     <motion.li
+      onClick={onMovieClicked}
       className={`w-full  ${index === 0
           ? 'origin-left'
           : index === 5
@@ -48,12 +58,12 @@ const SliderMovie = ({ movie, index }: { movie: IMovie, index: number }) => {
       <motion.img src={getImageUrl(movie.backdrop_path, 'w500')} alt={movie.title} className="w-full h-40 object-cover object-top" />
 
       <motion.div
-        className="bg-zinc-900 h-20 w-full px-4"
+        className="bg-zinc-900 h-32 w-full px-4 opacity-0"
         variants={infoVariants}
       >
         <h4 className="text-white text-center text-lg">{movie.title}</h4>
-        <p className="text-white text-sm">{getGenreNames(movie.genre_ids).join(", ")}</p>
         <p className="text-white text-sm">{movie.overview.slice(0, 50)}...</p>
+        <p className="text-white text-sm mt-2">{getGenreNames(movie.genre_ids).join(", ")}</p>
       </motion.div>
     </motion.li>
   )
@@ -120,7 +130,7 @@ const Home = () => {
             <p className='w-1/2'>{moviesData?.results[0].overview}</p>
           </section>
 
-          <section className='relative -mt-60'>
+          <section className='relative -mt-52'>
             <AnimatePresence onExitComplete={() => setSliderMoving(false)} initial={false}>
               <motion.ul
                 className='grid grid-cols-6 gap-[4px] absolute w-full'
@@ -136,6 +146,7 @@ const Home = () => {
                     key={movie.id}
                     index={num}
                     movie={movie}
+                    getGenreNames={getGenreNames}
                   />
                 ))}
               </motion.ul>

@@ -49,7 +49,7 @@ export const getMovies = async () => {
 };
 
 export const getGenres = async () => {
-    const url = `${BASE_URL}/genre/movie/list?language=ko`;
+    const url = `${BASE_URL}/genre/movie/list?language=en`;
     const options = {
         method: 'GET',
         headers: {
