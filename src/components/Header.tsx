@@ -84,7 +84,7 @@ const Header = () => {
     const [scope, animate] = useAnimate();
     useMotionValueEvent(scrollY, "change", (latest) => {
         if (latest > 80) {
-            animate(scope.current, { backgroundColor: '#1F2937' });
+            animate(scope.current, { backgroundColor: '#000' });
         } else {
             animate(scope.current, { backgroundColor: 'transparent' });
         }
@@ -93,7 +93,7 @@ const Header = () => {
     return (
         <header className='fixed top-0 left-0 w-full'>
             <motion.nav
-                className='h-24 px-8 flex gap-6 items-center text-white'
+                className='h-16 px-8 flex gap-6 items-center text-white'
                 ref={scope}
             >
                 <Logo />
