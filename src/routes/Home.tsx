@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMovies, getGenres, IGetMoviesResult, IMovie, IGenre, IGenreList, convertGenreIdsToNames } from "../api";
+import { getMovies, getGenres, IGetMoviesResult, IMovie, IGenreList, convertGenreIdsToNames } from "../api";
 import Loader from "../components/Loader";
 import { getImageUrl } from "../utils";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useScroll } from "framer-motion";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 
 const sliderVariants = {
   normal: {
@@ -32,7 +32,7 @@ const infoVariants = {
     opacity: 0,
   }
 }
-const SliderMovie = ({ movie, index, getGenreNames }: { 
+const SliderMovie = ({ movie, index, getGenreNames }: {
   movie: IMovie;
   index: number;
   getGenreNames: (ids: number[]) => string[];
@@ -45,15 +45,16 @@ const SliderMovie = ({ movie, index, getGenreNames }: {
     <motion.li
       onClick={onMovieClicked}
       className={`w-full  ${index === 0
-          ? 'origin-left'
-          : index === 5
-            ? 'origin-right'
-            : ''
+        ? 'origin-left'
+        : index === 5
+          ? 'origin-right'
+          : ''
         }`}
       variants={sliderVariants}
       initial='normal'
       whileHover='hover'
       transition={{ type: 'tween' }}
+      layoutId={movie.id.toString()}
     >
       <motion.img src={getImageUrl(movie.backdrop_path, 'w500')} alt={movie.title} className="w-full h-40 object-cover object-top" />
 
@@ -89,6 +90,9 @@ const rowVariants = {
 const offset = 6;
 
 const Home = () => {
+  const navigate = useNavigate();
+  const { scrollY } = useScroll();
+
   const { data: moviesData, isLoading: isLoadingMovies } = useQuery<IGetMoviesResult>({
     queryKey: ["movies", "nowPlaying"],
     queryFn: getMovies
@@ -114,7 +118,11 @@ const Home = () => {
     setIndex(prev => prev === maxIndex ? 0 : prev + 1);
   }
 
-  console.log(moviesData?.results);
+  const movieMatch = useMatch('/movies/:id');
+
+  const clickedMovie = movieMatch?.params.id && moviesData?.results.find(movie => movie.id === Number(movieMatch.params.id));
+  console.log(clickedMovie);
+
   return (
     <main className='h-[200vh]'>
       {isLoadingMovies ? <Loader /> : (
@@ -152,6 +160,35 @@ const Home = () => {
               </motion.ul>
             </AnimatePresence>
           </section>
+          <AnimatePresence>
+            {movieMatch && (
+              <>
+                <motion.div
+                  className="fixed top-0 w-full h-full bg-black/50"
+                  onClick={() => navigate('/')}
+                />
+                <motion.div
+                  className="absolute left-0 right-0 m-auto w-2/5 h-4/5 opacity-0"
+                  style={{ top: scrollY.get() + 100 }}
+                  layoutId={movieMatch.params.id}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {clickedMovie && <div className="bg-zinc-800 rounded-lg overflow-hidden relative">
+                    <div
+                      className="w-full h-80 bg-cover bg-center"
+                      style={{
+                        backgroundImage: `linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent), url(${getImageUrl(clickedMovie.backdrop_path, 'w500')})`
+                      }}
+                    />
+                      <h1 className="absolute z-10 top-64 left-0 right-0 p-4 text-white text-2xl font-bold">{clickedMovie.title}</h1>
+                      <p className="p-2 text-white text-sm">{clickedMovie.overview}</p>
+                      <p className="p-2 text-white text-sm">{getGenreNames(clickedMovie.genre_ids).join(", ")}</p>
+                  </div>}
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </>
       )}
     </main>

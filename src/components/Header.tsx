@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useMatch } from 'react-router-dom';
+import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useMotionValueEvent, useAnimate } from 'framer-motion';
+import { useForm } from 'react-hook-form';
 
 const logoVariants = {
     normal: {
@@ -54,19 +55,29 @@ const Logo = () => {
 }
 
 const Search = ({ onClick, searchOpen }: { onClick: () => void, searchOpen: boolean }) => {
+    const { register, handleSubmit } = useForm<{ keyword: string }>();
+    const navigate = useNavigate();
+    
+    const onValid = (data: { keyword: string }) => {
+        navigate(`/search?keyword=${data.keyword}`);
+    };
+
     return (
-        <div className='ml-auto flex items-center gap-2' >
-            <motion.input
-                type="text"
-                placeholder='Search Movie or TV show'
-                className='bg-transparent border-b border-white outline-none px-2 py-1'
-                animate={{ scaleX: searchOpen ? 1 : 0 }}
-                style={{ transformOrigin: "right center" }}
-            />
+        <div className='ml-auto flex items-center gap-2'>
+            <form onSubmit={handleSubmit(onValid)}>
+                <motion.input
+                    {...register("keyword", { required: true, minLength: 2 })}
+                    type="text"
+                    placeholder='Search Movie or TV show'
+                    className='bg-transparent border-b border-white outline-none px-2 py-1'
+                    animate={{ scaleX: searchOpen ? 1 : 0 }}
+                    style={{ transformOrigin: "right center" }}
+                />
+            </form>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
-                className="w-5 h-5 fill-current "
+                className="w-5 h-5 fill-current cursor-pointer"
                 onClick={onClick}
             >
                 <path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z" />

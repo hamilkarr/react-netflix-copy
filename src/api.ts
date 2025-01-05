@@ -70,3 +70,20 @@ export const convertGenreIdsToNames = (genreIds: number[], genreList: IGenre[]):
         genreList.find(genre => genre.id === id)?.name ?? ''
     ).filter(name => name !== '');
 };
+
+export const getSearchMovies = async (keyword: string) => {
+    const url = `${BASE_URL}/search/movie?query=${keyword}&include_adult=false&language=en-US&page=1`;
+    const options = {
+        method: 'GET',
+        headers: {
+            accept: 'application/json',
+            Authorization: `Bearer ${API_ACCESS_TOKEN}`
+        }
+    };
+
+    const response = await fetch(url, options);
+    if (!response.ok) {
+        throw new Error('Failed to fetch search movies');
+    }
+    return response.json();
+};

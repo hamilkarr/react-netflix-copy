@@ -19,20 +19,24 @@ const router = createBrowserRouter([
         element: <Home />
       },
       {
+        path: "/movies/:id",
+        element: <Home />
+      },
+      {
         path: "/tv",
         element: <Tv />
       },
       {
         path: "/search",
         element: <Search />
-      }
+      },
     ]
   }
 ]);
 
 function App() {
   return (
-      <RouterProvider router={router} />
+    <RouterProvider router={router} />
   );
 }
 
